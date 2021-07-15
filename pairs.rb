@@ -1,11 +1,23 @@
-size = 3
-people = %w(blinry Winston LF Pecca Hanno Winnie Lena karlabyrinth)
+def has_no_repetitions groups, previous_groups
+    groups.each do |g|
+        previous_groups.each do |pg|
+            # It's bad if g is a subset of pg:
+            if g.difference(pg).empty?
+                return false
+            end
+        end
+    end
+    return true
+end
+
+size = 2
+people = %w(Edgar Jakob Paolo skalabyrinth hanno Piko Winnie Lena Leah mad Daniel_Bohrer mo blinry Lena_aus_Leipzig)
 
 previous_groups =  IO.readlines("previous_groups").filter{|l| not l.empty?}.map { |line|
     line.chomp.split(",").map(&:strip).sort
 }
 
-10000.times do |i|
+100000.times do |i|
     people.shuffle!
     groups = people.each_slice(size).to_a
 
@@ -14,7 +26,8 @@ previous_groups =  IO.readlines("previous_groups").filter{|l| not l.empty?}.map 
     end
     groups.map!(&:sort)
 
-    next unless previous_groups.intersection(groups).empty?
+    # Try again if there's a duplicate.
+    next unless has_no_repetitions(groups, previous_groups)
 
     open("previous_groups", "a") do |f|
         f.puts
