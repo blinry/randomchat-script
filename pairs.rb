@@ -3,14 +3,14 @@
 def repetitions?(groups, previous_groups)
   groups.any? do |g|
     previous_groups.any? do |pg|
-      # It's bad if g is a subset of pg:
-      g.difference(pg).empty?
+      # It's bad if g and pg have more than 1 member in common
+      g.intersection(pg).size > 1
     end
   end
 end
 
-size = 3
-people = %w[Edgar Jakob Paolo skalabyrinth hanno Piko Winnie Lena Leah mad Daniel_Bohrer mo blinry Lena_aus_Leipzig]
+size = 2
+people = %w[A B C D E F]
 
 previous_groups = IO.readlines('previous_groups').filter { |l| !l.empty? }.map do |line|
   line.chomp.split(',').map(&:strip).sort
@@ -23,6 +23,8 @@ end
   groups[-2].concat groups.pop if groups.last.size == 1
   groups.map!(&:sort)
 
+  groups.each_with_index{|g,i| g.unshift((i+1).to_s)}
+
   # Try again if there's a duplicate.
   next if repetitions?(groups, previous_groups)
 
@@ -30,7 +32,7 @@ end
     f.puts
     puts "Found a grouping after #{i + 1} attempts:"
     groups.each_with_index do |g, room_number|
-      puts "Room #{room_number + 1}: #{g.join(', ')}"
+      puts "#{g.join(', ')}"
       f.puts g.join(', ')
     end
   end
